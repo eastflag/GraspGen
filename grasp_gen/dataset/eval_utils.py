@@ -279,10 +279,7 @@ def load_from_isaac_grasp_format(file_path: str) -> Tuple[np.ndarray, np.ndarray
     return grasps, confidences
 
 
-from yourdfpy.urdf import URDF
-
-
-def load_urdf_scene(urdf_path: str) -> URDF:
+def load_urdf_scene(urdf_path: str) -> "URDF":
     """Loads urdf scene given path."""
     import yourdfpy
 

@@ -28,8 +28,8 @@ from pxr import Gf, Sdf, Usd, UsdGeom, UsdPhysics
 
 WORLD_ROOT = "/World"
 ENV_SPACING_DEFAULT = 0.6
-# Robotiq 2F-85 USD root prim (note: file may say 2F_86 internally)
-GRIPPER_DEFAULT_PRIM = "/Robotiq_2F_86"
+# Robotiq 2F-85 USD root prim (note: file may say 2F_85 internally)
+GRIPPER_DEFAULT_PRIM = "/Robotiq_2F_85"
 OBJECT_DEFAULT_PRIM = "/world"
 
 

@@ -1,0 +1,72 @@
+python scripts/convert_obj_to_usd.py --input assets/objects/box.obj --output assets/objects/box.usd
+
+python scripts/demo_object_mesh.py --mesh_file assets/objects/box.obj --gripper_config ../GraspGenModels/checkpoints/graspgen_robotiq_2f_140.yml  --output_file assets/objects/box_grasps.yaml
+
+* gripper 와 box 로 구성된 usd 생성
+python scripts/create_grasp_sim_usd.py --object_usd assets/objects/box.usd --grasps_yaml assets/objects/box_grasps.yaml --output assets/objects/box_with_grasps_sim.usd --num_envs 10
+
+* ur10 + 2f-85 그리퍼 usd 생성하기 위해서 별도의 py 화일을 만들어서 아래와 같이 실행
+scripts/run_ur10_grasp_simulation.py 작성후
+/home/dklee/isaacsim/_build/linux-x86_64/release/python.sh scripts/run_ur10_grasp_simulation.py
+
+
+ ### 1. 시뮬레이션 결과 자유 관찰 및 검증
+
+  • 카메라 조작: Isaac Sim GUI 화면 안에서  Alt + 마우스 좌클릭 으로 카메라 회전,  Alt + 마우스 우클릭 으로 줌인/아웃을 조작하여 그리퍼의 핑거패드(Fingertip)가 박스의 표면
+  충돌구역에 정확히 안착(Contact)했는지 클로즈업하여 관찰해 봅니다.
+  • 충돌/물리 검사: 그리퍼가 박스를 조이는 과정에서 물체가 튕겨 나가거나 핑거 사이에서 미끄러지는 현상(Slip)이 있는지 물리적 안정성을 검증합니다.
+  ──────
+  ### 2. 물건을 위로 들어 올리는 동작 추가 (Grasp 성공 판정 테스트)
+
+  그리퍼가 박스를 단단히 잡았는지 확실하게 검증하기 위해, 움켜쥔 이후 로봇 팔을 위로 15cm 정도 들어 올리는 동작을 스크립트에 추가해 볼 수 있습니다.
+
+  run_ur10_grasp_simulation.py의  for step in range(240):  루프 내부를 다음과 같이 수정하면, 그리퍼가 완전히 닫힌 후(150 스텝 이후) 로봇 팔이 박스를 공중으로 들어 올리는
+리프팅(Lifting) 동작을
+  수행하게 됩니다:
+
+        # 시뮬레이션 스텝 루프 실행
+        for step in range(240):  # 약 4초 시뮬레이션
+            world.step(render=True)
+
+            # 1. 로봇 팔이 도달한 시점(약 1.5초 이후)부터 그리퍼 작동
+            if step > 100:
+                gripper_joint_targets = np.array([0.8] * (robot.num_dof - 6))
+                robot.apply_action(
+                    ArticulationAction(
+                        joint_positions=gripper_joint_targets,
+                        joint_indices=np.array(list(range(6, robot.num_dof)))
+                    )
+                )
+
+            # 2. 완전히 잡은 이후(약 2.5초 이후) 위로 들어 올리는 동작 제어 추가
+            if step > 150:
+                # 목표 포즈를 기존 Grasp 위치에서 Z축으로 +0.15m 상승시킴
+                lift_tcp_pose = T_target_tcp.copy()
+                lift_tcp_pose[2, 3] += 0.15
+
+                # 리프팅에 대한 새로운 IK 계산
+                lift_positions, lift_success = kin_solver.compute_inverse_kinematics(
+                    frame_name="ee_link",
+                    target_position=lift_tcp_pose[:3, 3],
+                    target_orientation=tra.quaternion_from_matrix(lift_tcp_pose)
+                )
+                if lift_success:
+                    robot.apply_action(
+                        ArticulationAction(joint_positions=lift_positions[:6]),
+                        joint_indices=list(range(6))
+                    )
+    ──────
+  ### 3. 다른 물체(예: 바나나)로 시뮬레이션 확장
+
+  박스 외에 레포지토리 내의 다른 오브젝트(예:  assets/objects/banana.obj )에 대해서도 동일하게 가동해 볼 수 있습니다:
+
+  1. 바나나 메쉬 변환:
+    python scripts/convert_obj_to_usd.py --input assets/objects/banana.obj --output assets/objects/banana.usd
+
+  2. 바나나 Grasp 포즈 예측:
+    python scripts/demo_object_mesh.py --mesh_file assets/objects/banana.obj --gripper_config ../GraspGenModels/checkpoints/graspgen_robotiq_2f_140.yml --output_file
+  assets/objects/banana_grasps.yaml
+
+  3. 시뮬레이션 스크립트의 파일명 변경:
+      •  run_ur10_grasp_simulation.py  내의  box.usd  및  box_grasps.yaml  파일 로드 경로를 각각  banana.usd 와  banana_grasps.yaml 로 변경하여 다시 실행하면 바나나를 움켜쥐는
+      동작도 시뮬레이션할 수 있습니다!

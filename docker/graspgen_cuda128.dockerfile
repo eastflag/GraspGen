@@ -12,7 +12,7 @@ RUN pip install h5py hydra-core matplotlib meshcat scikit-learn scipy tensorboar
 # Install scene_synthesizer
 RUN pip install scene-synthesizer[recommend]
 
-RUN pip install torch==2.1.0 torchvision
+RUN pip install torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128
 
 # Install torch_cluster
 RUN pip install torch-cluster -f https://data.pyg.org/whl/torch-2.7.0+cu128.html
@@ -32,7 +32,7 @@ RUN pip install huggingface-hub==0.25.2
 
 # PointTransformerV3 dependencies
 RUN pip install addict yapf==0.40.1 tensorboardx sharedarray torch-geometric
-RUN pip install torch-scatter -f https://data.pyg.org/whl/torch-2.1.2+cu121.html
+RUN pip install torch-scatter -f https://data.pyg.org/whl/torch-2.7.0+cu128.html
 # RUN pip install spconv-cu128 # This is not available yet: https://github.com/Pointcept/PointTransformerV3/issues/159
 
 # For the analytic model

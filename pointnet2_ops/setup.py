@@ -2,6 +2,10 @@ import glob
 import os.path as osp
 
 from setuptools import find_packages, setup
+# Bypass CUDA version mismatch check (e.g. system CUDA 13.0 vs PyTorch CUDA 12.8)
+import torch.utils.cpp_extension
+torch.utils.cpp_extension._check_cuda_version = lambda *args, **kwargs: None
+
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 
 this_dir = osp.dirname(osp.abspath(__file__))

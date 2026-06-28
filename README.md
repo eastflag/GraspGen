@@ -106,7 +106,7 @@ conda create -n GraspGen python=3.10 -y && conda activate GraspGen
 ```
 **[Optional]** If you do not already have pytorch installed:
 ```bash
-pip install torch==2.1.0 torchvision==0.16.0 torch-cluster torch-scatter -f https://data.pyg.org/whl/torch-2.1.0+cu121.html
+pip install torch==2.7.0 torchvision==0.22.0 torch-cluster torch-scatter -f https://data.pyg.org/whl/torch-2.7.0+cu128.html
 ```
 Install with pip:
 ```bash
