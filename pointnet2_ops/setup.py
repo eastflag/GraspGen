@@ -2,11 +2,11 @@ import glob
 import os.path as osp
 
 from setuptools import find_packages, setup
-# Bypass CUDA version mismatch check (e.g. system CUDA 13.0 vs PyTorch CUDA 12.8)
-import torch.utils.cpp_extension
-torch.utils.cpp_extension._check_cuda_version = lambda *args, **kwargs: None
-
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension
+import torch.utils.cpp_extension
+
+# CUDA 버전 불일치 에러를 무시하도록 강제 우회
+torch.utils.cpp_extension._check_cuda_version = lambda *args, **kwargs: None
 
 this_dir = osp.dirname(osp.abspath(__file__))
 _ext_src_root = osp.join("pointnet2_ops", "_ext-src")

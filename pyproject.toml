@@ -131,6 +131,15 @@ prerelease = "allow"
 # Use find-links for PyG packages (flat HTML page, not a PEP 503 index)
 find-links = ["https://data.pyg.org/whl/torch-2.7.0+cu128.html"]
 
+[[tool.uv.index]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch" }
+torchvision = { index = "pytorch" }
+
 # Build dependencies for packages that need special build requirements
 [tool.uv.extra-build-dependencies]
 sharedarray = ["setuptools>=45,<78"]
